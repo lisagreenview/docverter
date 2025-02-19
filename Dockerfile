@@ -1,39 +1,30 @@
-# Use Ubuntu 20.04 as the base image
-FROM ubuntu:20.04
+# Use the official Ruby 3.1 slim image as the base
+FROM ruby:3.1-slim
 
 # Avoid interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update package lists and install dependencies:
-# - build-essential: for compiling native extensions
-# - curl, git: common utilities
-# - pandoc: document converter
-# - texlive-xetex, texlive-fonts-recommended, texlive-plain-generic: TeX distribution including xelatex
-# - ruby, ruby-dev: Ruby runtime and development headers
-# - libsqlite3-dev, sqlite3: if Docverter uses SQLite (adjust if using another DB)
-# - nodejs: for any JS dependencies
+# Install system dependencies: 
+# - pandoc for document conversion
+# - texlive-xetex and related packages for xelatex support
+# - build-essential, git, and nodejs for general use
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    curl \
-    git \
     pandoc \
     texlive-xetex \
     texlive-fonts-recommended \
     texlive-plain-generic \
-    ruby \
-    ruby-dev \
-    libsqlite3-dev \
-    sqlite3 \
+    build-essential \
+    git \
     nodejs \
     && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
 WORKDIR /app
 
-# Copy Gemfile and Gemfile.lock into the container for dependency installation
+# Copy your Gemfile and Gemfile.lock first to leverage Docker cache
 COPY Gemfile Gemfile.lock ./
 
-# Install Bundler and Ruby gems
+# Install Bundler (the Ruby image now comes with Ruby 3.1 so latest Bundler works)
 RUN gem install bundler && bundle install --jobs 4
 
 # Copy the rest of your Docverter source code
