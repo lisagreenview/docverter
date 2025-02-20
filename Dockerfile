@@ -6,11 +6,12 @@ ENV JRUBY_VERSION=1.7.13
 ENV JRUBY_HOME=/opt/jruby-$JRUBY_VERSION
 ENV PATH=$JRUBY_HOME/bin:$PATH
 
-# Force Java to use TLS 1.2
+# Force Java to use TLS 1.2: set both JAVA_OPTS and _JAVA_OPTIONS
 ENV JAVA_OPTS="-Dhttps.protocols=TLSv1.2"
+ENV _JAVA_OPTIONS="-Dhttps.protocols=TLSv1.2"
 
 # Avoid interactive prompts during package installation
-ENV DEBIAN_FRONTEND=noninteractive
+# ENV DEBIAN_FRONTEND=noninteractive
 
 # Install necessary Linux packages
 # - pandoc for document conversion
@@ -41,9 +42,9 @@ WORKDIR /app
 # Copy your Gemfile and Gemfile.lock first to leverage Docker cache
 COPY Gemfile Gemfile.lock ./
 
-# Uninstall any preinstalled bundler and install a compatible version (Bundler 1.17.3 is often used with JRuby 1.7)
+# Uninstall any preinstalled bundler and install Bundler 1.17.3 explicitly using the secure source
 RUN gem uninstall bundler -aIx && \
-    gem install bundler -v 1.17.3 --no-document
+    gem install bundler -v 1.17.3 --source https://rubygems.org --no-document
 
 # Install project gems using Bundler 1.17.3
 RUN bundle _1.17.3_ install
