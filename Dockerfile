@@ -24,8 +24,8 @@ WORKDIR /app
 # Copy your Gemfile and Gemfile.lock first to leverage Docker cache
 COPY Gemfile Gemfile.lock ./
 
-# Install Bundler (the Ruby image now comes with Ruby 3.1 so latest Bundler works)
-RUN gem install bundler && bundle install --jobs 4
+# Explicitly install and use Bundler 2.4.22
+RUN gem install bundler:2.4.22 && bundle _2.4.22_ install --jobs 4
 
 # Copy the rest of your Docverter source code
 COPY . .
