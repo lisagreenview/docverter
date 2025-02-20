@@ -6,6 +6,9 @@ ENV JRUBY_VERSION=1.7.13
 ENV JRUBY_HOME=/opt/jruby-$JRUBY_VERSION
 ENV PATH=$JRUBY_HOME/bin:$PATH
 
+# Force Java to use TLS 1.2
+ENV JAVA_OPTS="-Dhttps.protocols=TLSv1.2"
+
 # Avoid interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -14,6 +17,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # - texlive-xetex and related packages for xelatex support
 # - build-essential, git, and nodejs for general use
 RUN apt-get update && apt-get install -y \
+    ca-certificates \
     wget \
     unzip \
     pandoc \
@@ -37,11 +41,11 @@ WORKDIR /app
 # Copy your Gemfile and Gemfile.lock first to leverage Docker cache
 COPY Gemfile Gemfile.lock ./
 
-# Install an older version of Bundler compatible with Ruby 1.9.3 / JRuby 1.7.13
-# Bundler 1.17.3 is a commonly used version for older Ruby environments.
-RUN gem install bundler -v 1.17.3
+# Uninstall any preinstalled bundler and install a compatible version (Bundler 1.17.3 is often used with JRuby 1.7)
+RUN gem uninstall bundler -aIx && \
+    gem install bundler -v 1.17.3 --no-document
 
-# Install the project gems
+# Install project gems using Bundler 1.17.3
 RUN bundle _1.17.3_ install
 
 # Copy the rest of your Docverter source code
