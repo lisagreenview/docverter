@@ -42,7 +42,7 @@ RUN wget https://s3.amazonaws.com/jruby.org/downloads/$JRUBY_VERSION/jruby-bin-$
 WORKDIR /app
 
 # Copy your Gemfile and Gemfile.lock first to leverage Docker cache
-COPY Gemfile Gemfile.lock ./
+COPY Gemfile Gemfile.lock* *.gemspec ./
 
 # Remove any preinstalled bundler (if necessary)
 RUN gem uninstall bundler -aIx || true
