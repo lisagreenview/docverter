@@ -44,6 +44,8 @@ WORKDIR /app
 # Copy your Gemfile and Gemfile.lock first to leverage Docker cache
 COPY Gemfile Gemfile.lock* *.gemspec lib/ ./
 
+RUN ls -R /app/lib
+
 # Remove any preinstalled bundler (if necessary)
 RUN gem uninstall bundler -aIx || true
 
